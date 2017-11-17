@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function, unicode_literals
-import re
+import re, functools
 
 def get_range(r):
     try:
@@ -9,13 +9,15 @@ def get_range(r):
     except TypeError:
         return map(lambda x: int(x), list(r))
 
-def exists(ranges, r):
+def _exists(ranges, r):
     rs, re = get_range(r)
     for s, e in ranges:
+        if rs >= s:
+            rs = re if re <= e else e
         if rs==re:
             return True
-        if s < 
-        
+        if s >= re:
+            break
     return False
 
 def add_range(s, e, ranges):
@@ -74,15 +76,26 @@ def pack_ranges(ranges):
     pass
 
 def restore_range(r, restored_ranges):
-    pass
+    restored_ranges.append(get_range(r))
 
 def collect_data(data, ranges):
-    pass
+    collected = []
+    for s, e in ranges:
+        for idx in range(s,e):
+            collected.append(data['data'][idx])
+    return collected
 
-def restore(mapping, selected):
+def restore(mapping, selected=None):
+    if selected is None:
+        selected = mapping['output']
     selected_ranges = generate_ranges(selected)
-    restored_ranges = []
-    for r, expr in mapping['imap'].items():
-        if eval(re.sub(r'exists[ \t]*\(', 'exists(selected_ranges,', expr)):
-            restore_range(r, restored_ranges)
-    return collect_data(mapping['input'], restored_ranges)
+    if 'imap' in mapping:
+        exists = functools.partial(_exists, selected_ranges)
+        local_dict = {'exists':exists, 'E':exists}
+        restored_ranges = []
+        for r, expr in mapping['imap'].items():
+            if eval(expr, globals(), local_dict):
+                restore_range(r, restored_ranges)
+        return collect_data(mapping['input'], restored_ranges)
+    else:
+        return collect_data(mapping, selected_ranges)
