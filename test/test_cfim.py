@@ -1,11 +1,12 @@
 from context import cfim
 import unittest
-from cfim import restore, interval
+from cfim import restore, interval as I
 
 class TestParser(unittest.TestCase):
 
     def _test_prep(self):
-        original_input = { 'data': { 0: 'Red', 1: 'Yellow', 2:'Blue' }, 'output': [interval(0,2)] }
+        #original_input = { 'data': { 0: 'Red', 1: 'Yellow', 2:'Blue' }, 'output': [(0,3)] }
+        original_input = { 'data': { 0: 'Red', 1: 'Yellow', 2:'Blue' }, 'output': [I(0,2)] }
         output_data = {0: 'Purple', 1: 'Green', 2: 'Orange'}
         transformed_text = [0, 1, 2]
         #inversion_mapping = {0: 'exists(0) or exists(2)', 1: 'exists(1) or exists(2)', 2: 'exists(0) or exists(1)'}

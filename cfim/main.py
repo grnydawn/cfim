@@ -3,15 +3,65 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import re, functools
 
 class interval(object):
-    def __init__(self, start, stop=None, leftopen=False, rightopen=False):
-        assert isinstance(start, int)
-        if stop is None: stop = start + 1
-        self.start = start+1 if leftopen else start
-        self.stop = stop-1 if rightopen else stop
-        assert self.start <= self.stop
+    def __init__(self, start, stop=None, left_open=False, right_open=False):
+        if isinstance(start, int):
+            if stop is None: stop = start + 1
+            self.start = start+1 if left_open else start
+            self.stop = stop-1 if right_open else stop
+            if self.start > self.stop:
+                self.start = None
+                self.stop = None
+        elif isinstance(start, interval):
+            self.start = start.start
+            self.stop = start.stop
+        else:
+            assert False
+        self.current = self.start
 
     def __getitem__(self, key):
+        assert isinstance(key, int)
+        if key>=self.start and key<=self.stop:
+            return True
+        else:
+            return False
+
+    def __iter__(self):
+        if self.start is None or self.stop is None:
+            return iter([])
+        else:
+            self.current = self.start
+            return self
+
+    def __next__(self):
+        if self.current is None or self.current>self.stop:
+            raise StopIteration
+        else:
+            self.current += 1
+            return self.current - 1
+
+    next = __next__
+
+    def __hash__(self):
+        return hash(self.slice())
+
+    def __repr__(self):
+        return str(self.slice())
+
+    def slice(self):
+        return self.start, self.stop if self.stop is None else self.stop+1
+
+class intervals(object):
+    pass
+
+    def __contains__(self, index):
         pass
+
+    def insert(self, index):
+        pass
+
+    def remove(self, index):
+        pass
+
 
 def get_range(r):
     try:
