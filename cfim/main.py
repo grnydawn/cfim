@@ -2,6 +2,17 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import re, functools
 
+class interval(object):
+    def __init__(self, start, stop=None, leftopen=False, rightopen=False):
+        assert isinstance(start, int)
+        if stop is None: stop = start + 1
+        self.start = start+1 if leftopen else start
+        self.stop = stop-1 if rightopen else stop
+        assert self.start <= self.stop
+
+    def __getitem__(self, key):
+        pass
+
 def get_range(r):
     try:
         v = int(r)
@@ -64,7 +75,6 @@ def generate_ranges(indices, initial_ranges=[]):
         s, e = get_range(r)
         add_range(s, e, ranges)
     return ranges
-
 
 def has_range(range, ranges):
     pass
